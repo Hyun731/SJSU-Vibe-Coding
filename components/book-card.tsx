@@ -28,6 +28,7 @@ export function BookCard({ book, view = "grid", onClick }: BookCardProps) {
           author={book.author}
           coverColor={book.coverColor}
           coverPattern={book.coverPattern}
+          coverUrl={book.coverUrl}
           size="sm"
         />
         <div className="flex-1 min-w-0">
@@ -91,6 +92,7 @@ export function BookCard({ book, view = "grid", onClick }: BookCardProps) {
           author={book.author}
           coverColor={book.coverColor}
           coverPattern={book.coverPattern}
+          coverUrl={book.coverUrl}
           size="md"
         />
       </div>

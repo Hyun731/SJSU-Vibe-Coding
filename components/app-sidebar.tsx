@@ -15,6 +15,7 @@ import {
 import { cn } from "@/lib/utils";
 import { useBookStore } from "@/lib/book-store";
 import { Button } from "@/components/ui/button";
+import { logout } from "@/app/login/actions";
 
 const NAV_ITEMS = [
   { href: "/", label: "Dashboard", icon: LayoutDashboard },
@@ -107,10 +108,15 @@ export function AppSidebar() {
       </div>
 
       {/* Footer */}
-      <div className="px-4 py-4 border-t border-sidebar-border">
+      <div className="px-4 py-4 border-t border-sidebar-border flex flex-col gap-2">
         <p className="text-[10px] text-sidebar-foreground/40 text-center">
           {counts.all} books in your library
         </p>
+        <form action={logout}>
+          <Button variant="ghost" size="sm" className="w-full text-muted-foreground hover:text-foreground">
+            Sign Out
+          </Button>
+        </form>
       </div>
     </nav>
   );

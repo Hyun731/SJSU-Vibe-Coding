@@ -5,6 +5,7 @@ interface BookCoverProps {
   author: string;
   coverColor: string;
   coverPattern?: number;
+  coverUrl?: string;
   size?: "xs" | "sm" | "md" | "lg";
   className?: string;
 }
@@ -37,9 +38,26 @@ const SIZE_CONFIG = {
   lg: { width: 128, height: 180, titleSize: "text-[11px]", authorSize: "text-[9px]", spineWidth: 16 },
 };
 
-export function BookCover({ title, author, coverColor, coverPattern = 0, size = "md", className }: BookCoverProps) {
+export function BookCover({ title, author, coverColor, coverPattern = 0, coverUrl, size = "md", className }: BookCoverProps) {
   const cfg = SIZE_CONFIG[size];
   const patternId = `pat-${title.slice(0, 4)}-${coverPattern}`;
+
+  if (coverUrl) {
+    return (
+      <div 
+        className={cn("relative flex-shrink-0 rounded-sm overflow-hidden shadow-md bg-secondary/30", className)} 
+        style={{ width: cfg.width, height: cfg.height }}
+      >
+        <img 
+          src={coverUrl} 
+          alt={`Cover of ${title}`}
+          className="w-full h-full object-cover"
+        />
+        {/* Spine shadow for realism */}
+        <div className="absolute inset-y-0 left-0 w-[4px] bg-gradient-to-r from-black/40 to-transparent" />
+      </div>
+    );
+  }
 
   return (
     <div className={cn("relative flex-shrink-0 rounded-sm overflow-hidden shadow-md", className)} style={{ width: cfg.width, height: cfg.height }}>

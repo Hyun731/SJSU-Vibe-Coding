@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { Search, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -49,6 +50,49 @@ export function BookForm({ initial, onSave, onCancel }: BookFormProps) {
   });
 
   const [errors, setErrors] = useState<Partial<Record<keyof BookFormData, string>>>({});
+  const [isSearching, setIsSearching] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
+
+  async function handleSearch() {
+    if (!searchQuery.trim()) return;
+    setIsSearching(true);
+    try {
+      const res = await fetch(`https://www.googleapis.com/books/v1/volumes?q=${encodeURIComponent(searchQuery)}&maxResults=1`);
+      const data = await res.json();
+      
+      if (data.items && data.items.length > 0) {
+        const info = data.items[0].volumeInfo;
+        
+        let isbn = "";
+        if (info.industryIdentifiers) {
+          const isbn13 = info.industryIdentifiers.find((id: any) => id.type === "ISBN_13");
+          const isbn10 = info.industryIdentifiers.find((id: any) => id.type === "ISBN_10");
+          isbn = isbn13 ? isbn13.identifier : (isbn10 ? isbn10.identifier : "");
+        }
+
+        let coverUrl = info.imageLinks?.thumbnail || info.imageLinks?.smallThumbnail || "";
+        if (coverUrl) {
+          coverUrl = coverUrl.replace("http:", "https:");
+        }
+
+        setForm(prev => ({
+          ...prev,
+          title: info.title || prev.title,
+          author: info.authors ? info.authors.join(", ") : prev.author,
+          pages: info.pageCount || prev.pages,
+          coverUrl: coverUrl || prev.coverUrl,
+          isbn: isbn || prev.isbn,
+        }));
+      } else {
+        alert("No book found with that query.");
+      }
+    } catch (e) {
+      console.error("Search failed", e);
+      alert("Failed to search book.");
+    } finally {
+      setIsSearching(false);
+    }
+  }
 
   function validate(): boolean {
     const e: typeof errors = {};
@@ -69,6 +113,30 @@ export function BookForm({ initial, onSave, onCancel }: BookFormProps) {
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
+      {/* Google Books Search (Only show if not editing an existing book) */}
+      {!initial && (
+        <div className="flex gap-2 items-end p-3 bg-secondary/50 rounded-lg border border-border">
+          <div className="flex-1 space-y-1.5">
+            <Label htmlFor="book-search">Auto-fill from Google Books</Label>
+            <Input
+              id="book-search"
+              placeholder="Search by title, author, or ISBN"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') {
+                  e.preventDefault();
+                  handleSearch();
+                }
+              }}
+            />
+          </div>
+          <Button type="button" variant="secondary" onClick={handleSearch} disabled={isSearching || !searchQuery.trim()}>
+            {isSearching ? <Loader2 className="w-4 h-4 animate-spin" /> : <Search className="w-4 h-4" />}
+          </Button>
+        </div>
+      )}
+
       {/* Title & Author */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div className="space-y-1.5">

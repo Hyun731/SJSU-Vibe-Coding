@@ -86,6 +86,7 @@ export function BookDetail({ book, open, onClose }: BookDetailProps) {
                 author={book.author}
                 coverColor={book.coverColor}
                 coverPattern={book.coverPattern}
+                coverUrl={book.coverUrl}
                 size="lg"
               />
             </div>

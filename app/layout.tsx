@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Lora } from "next/font/google";
 import "./globals.css";
 import { AppSidebar } from "@/components/app-sidebar";
+import { SupabaseProvider } from "@/components/supabase-provider";
 
 const lora = Lora({
   subsets: ["latin"],
@@ -19,10 +20,12 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="en" className={`${lora.variable} bg-background`}>
       <body className="font-sans antialiased">
         <div className="flex min-h-screen">
-          <AppSidebar />
-          <main className="flex-1 min-w-0">
-            {children}
-          </main>
+          <SupabaseProvider>
+            <AppSidebar />
+            <main className="flex-1 min-w-0">
+              {children}
+            </main>
+          </SupabaseProvider>
         </div>
       </body>
     </html>
